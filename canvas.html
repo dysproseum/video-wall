@@ -1,0 +1,107 @@
+<html>
+<head>
+<style type="text/css">
+body {
+  margin: 0;
+  background: #333333;
+}
+canvas {
+  background: black;
+}
+video {
+  width: 30%;
+  border: 1px solid white;
+}
+</style>
+<script type="text/javascript">
+var timer;
+window.addEventListener("load", function() {
+
+  // Source.
+  const fps = 30;
+  const src = '../ground.mp4';
+  const w = 640;
+  const h = 360;
+  const w_1_3 = w / 3;
+  const w_2_3 = 2 * w / 3;
+  const h_1_3 = h / 3;
+  const h_2_3 = 2 * h / 3;
+
+  // Source matrix.
+  var source = new Array(9);
+  source[0] = [0, 		0, 		w_1_3,	 		h_1_3];
+  source[1] = [w_1_3, 		0, 		w_1_3,			h_1_3];
+  source[2] = [w_2_3,		0,		w_1_3,			h_1_3];
+  source[3] = [0,		h_1_3,		w_1_3,	 		h_1_3];
+  source[4] = [w_1_3,		h_1_3,		w_1_3,			h_1_3];
+  source[5] = [w_2_3,		h_1_3,		w_1_3,			h_1_3];
+  source[6] = [0,		h_2_3,		w_1_3,			h_1_3];
+  source[7] = [w_1_3,		h_2_3,		w_1_3,			h_1_3];
+  source[8] = [w_2_3,		h_2_3,		w_1_3,			h_1_3];
+
+  // Target.
+  var cw = 1920;
+  var ch = 1080;
+  var cw_1_3 = cw / 3;
+  var cw_2_3 = 2 * cw / 3;
+  var ch_1_3 = ch / 3;
+  var ch_2_3 = 2 * ch / 3;
+  var b = 10;
+
+  // Target matrix.
+  var target = new Array(9);
+  target[0] = [b, 		b, 			cw_1_3,			ch_1_3];
+  target[1] = [2 * b + cw_1_3, 	b, 			cw_1_3,			ch_1_3];
+  target[2] = [3 * b + cw_2_3,	b,			cw_1_3,			ch_1_3];
+  target[3] = [b,		2 * b + ch_1_3,		cw_1_3, 		ch_1_3];
+  target[4] = [2 * b + cw_1_3,	2 * b + ch_1_3,		cw_1_3,			ch_1_3];
+  target[5] = [3 * b + cw_2_3,	2 * b + ch_1_3,		cw_1_3,			ch_1_3];
+  target[6] = [b,		3 * b + ch_2_3,		cw_1_3,			ch_1_3];
+  target[7] = [2 * b + cw_1_3,	3 * b + ch_2_3,		cw_1_3,			ch_1_3];
+  target[8] = [3 * b + cw_2_3,	3 * b + ch_2_3,		cw_1_3,			ch_1_3];
+
+  // Setup elements.
+  const vid = document.querySelector("video");
+  vid.src = src;
+  const stop = document.getElementById("stop");
+  const play = document.getElementById("play");
+
+  stop.addEventListener("click", function() {
+    console.log("stopping " + vid.className);
+    clearInterval(timer);
+    vid.pause();
+  });
+  play.addEventListener("click", function() {
+    console.log("playing " + vid.className);
+    vid.play();
+  });
+
+  const canvas = document.getElementById("canvas");
+  const context = canvas.getContext('2d');
+  canvas.width = cw;
+  canvas.height = ch;
+  vid.addEventListener("play", function() {
+    if (vid.paused || vid.ended) {
+      clearInterval(timer);
+      return false;
+    }
+    timer = setInterval(function() {
+      for (i=0; i < 9; i++) {
+        context.drawImage(vid, source[i][0], source[i][1], source[i][2], source[i][3], target[i][0], target[i][1], target[i][2], target[i][3]);
+      }
+    }, 1000 / fps);
+  });
+});
+</script>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<video loop controls muted></video>
+
+<button id="stop">Stop All</button>
+<button id="play">Play All</button>
+
+</body>
+</html>
