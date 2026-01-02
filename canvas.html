@@ -7,6 +7,7 @@ body {
 }
 canvas {
   background: black;
+  width: 100%;
 }
 video {
   width: 30%;
@@ -14,7 +15,35 @@ video {
 }
 </style>
 <script type="text/javascript">
+var canvas;
+var target;
 var timer;
+
+function computeTargetMatrix(width, height) {
+  // Target.
+  var cw = width;
+  var ch = height;
+  var cw_1_3 = cw / 3;
+  var cw_2_3 = 2 * cw / 3;
+  var ch_1_3 = ch / 3;
+  var ch_2_3 = 2 * ch / 3;
+  var b = 10;
+
+  // Target matrix.
+  var target = new Array(9);
+  target[0] = [b, 		b, 			cw_1_3,			ch_1_3];
+  target[1] = [2 * b + cw_1_3, 	b, 			cw_1_3,			ch_1_3];
+  target[2] = [3 * b + cw_2_3,	b,			cw_1_3,			ch_1_3];
+  target[3] = [b,		2 * b + ch_1_3,		cw_1_3, 		ch_1_3];
+  target[4] = [2 * b + cw_1_3,	2 * b + ch_1_3,		cw_1_3,			ch_1_3];
+  target[5] = [3 * b + cw_2_3,	2 * b + ch_1_3,		cw_1_3,			ch_1_3];
+  target[6] = [b,		3 * b + ch_2_3,		cw_1_3,			ch_1_3];
+  target[7] = [2 * b + cw_1_3,	3 * b + ch_2_3,		cw_1_3,			ch_1_3];
+  target[8] = [3 * b + cw_2_3,	3 * b + ch_2_3,		cw_1_3,			ch_1_3];
+
+  return target;
+}
+
 window.addEventListener("load", function() {
 
   // Source.
@@ -39,26 +68,7 @@ window.addEventListener("load", function() {
   source[7] = [w_1_3,		h_2_3,		w_1_3,			h_1_3];
   source[8] = [w_2_3,		h_2_3,		w_1_3,			h_1_3];
 
-  // Target.
-  var cw = 1920;
-  var ch = 1080;
-  var cw_1_3 = cw / 3;
-  var cw_2_3 = 2 * cw / 3;
-  var ch_1_3 = ch / 3;
-  var ch_2_3 = 2 * ch / 3;
-  var b = 10;
-
-  // Target matrix.
-  var target = new Array(9);
-  target[0] = [b, 		b, 			cw_1_3,			ch_1_3];
-  target[1] = [2 * b + cw_1_3, 	b, 			cw_1_3,			ch_1_3];
-  target[2] = [3 * b + cw_2_3,	b,			cw_1_3,			ch_1_3];
-  target[3] = [b,		2 * b + ch_1_3,		cw_1_3, 		ch_1_3];
-  target[4] = [2 * b + cw_1_3,	2 * b + ch_1_3,		cw_1_3,			ch_1_3];
-  target[5] = [3 * b + cw_2_3,	2 * b + ch_1_3,		cw_1_3,			ch_1_3];
-  target[6] = [b,		3 * b + ch_2_3,		cw_1_3,			ch_1_3];
-  target[7] = [2 * b + cw_1_3,	3 * b + ch_2_3,		cw_1_3,			ch_1_3];
-  target[8] = [3 * b + cw_2_3,	3 * b + ch_2_3,		cw_1_3,			ch_1_3];
+  target = computeTargetMatrix(window.innerWidth, window.innerHeight);
 
   // Setup elements.
   const vid = document.querySelector("video");
@@ -78,8 +88,8 @@ window.addEventListener("load", function() {
 
   const canvas = document.getElementById("canvas");
   const context = canvas.getContext('2d');
-  canvas.width = cw;
-  canvas.height = ch;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
   vid.addEventListener("play", function() {
     if (vid.paused || vid.ended) {
       clearInterval(timer);
@@ -91,6 +101,13 @@ window.addEventListener("load", function() {
       }
     }, 1000 / fps);
   });
+});
+
+window.addEventListener("resize", function(e) {
+  // compute target matrix.
+  canvas.width = e.target.innerWidth;
+  canvas.height = e.target.innerHeight;
+  target = computeTargetMatrix(e.target.innerWidth, e.target.innerHeight);
 });
 </script>
 </head>
