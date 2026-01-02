@@ -4,6 +4,7 @@
 body {
   margin: 0;
   background: #333333;
+  color: white;
 }
 canvas {
   background: black;
@@ -15,66 +16,106 @@ video {
 }
 </style>
 <script type="text/javascript">
+const src = '../ground.mp4';
+const fps = 30;
+var gridWidth = 5;
+var gridHeight = 4;
+var b = 10; // bezel (border) size.
 var canvas;
+var context;
+var source;
 var target;
 var timer;
 
-function computeTargetMatrix(width, height) {
+function computeSourceMatrix(cols, rows) {
+  // Source.
+  const w = 640;
+  const h = 360;
+
+  // Source matrix.
+  var source = new Array(cols * rows);
+  var i = 0;
+  for(y=0; y < rows; y++) {
+    for(x=0; x < cols; x++) {
+      source[i] = [x * w / cols , y * h / rows, w / cols, h / rows];
+      i++;
+    }
+  }
+
+  //source[0] = [0, 		0, 		w_1_3,	 		h_1_3];
+  //source[1] = [w_1_3, 	0, 		w_1_3,			h_1_3];
+  //source[2] = [w_2_3,		0,		w_1_3,			h_1_3];
+  //source[3] = [0,		h_1_3,		w_1_3,	 		h_1_3];
+  //source[4] = [w_1_3,		h_1_3,		w_1_3,			h_1_3];
+  //source[5] = [w_2_3,		h_1_3,		w_1_3,			h_1_3];
+  //source[6] = [0,		h_2_3,		w_1_3,			h_1_3];
+  //source[7] = [w_1_3,		h_2_3,		w_1_3,			h_1_3];
+  //source[8] = [w_2_3,		h_2_3,		w_1_3,			h_1_3];
+
+  return source;
+}
+
+function computeTargetMatrix(cols, rows) {
   // Target.
-  var cw = width;
-  var ch = height;
-  var cw_1_3 = cw / 3;
-  var cw_2_3 = 2 * cw / 3;
-  var ch_1_3 = ch / 3;
-  var ch_2_3 = 2 * ch / 3;
-  var b = 10;
+  var cw = window.innerWidth - b * (cols - 1);
+  var ch = window.innerHeight - b * (rows - 1);
 
   // Target matrix.
-  var target = new Array(9);
-  target[0] = [b, 		b, 			cw_1_3,			ch_1_3];
-  target[1] = [2 * b + cw_1_3, 	b, 			cw_1_3,			ch_1_3];
-  target[2] = [3 * b + cw_2_3,	b,			cw_1_3,			ch_1_3];
-  target[3] = [b,		2 * b + ch_1_3,		cw_1_3, 		ch_1_3];
-  target[4] = [2 * b + cw_1_3,	2 * b + ch_1_3,		cw_1_3,			ch_1_3];
-  target[5] = [3 * b + cw_2_3,	2 * b + ch_1_3,		cw_1_3,			ch_1_3];
-  target[6] = [b,		3 * b + ch_2_3,		cw_1_3,			ch_1_3];
-  target[7] = [2 * b + cw_1_3,	3 * b + ch_2_3,		cw_1_3,			ch_1_3];
-  target[8] = [3 * b + cw_2_3,	3 * b + ch_2_3,		cw_1_3,			ch_1_3];
+  var target = new Array(cols * rows);
+  var i = 0;
+  for(y=0; y < rows; y++) {
+    for(x=0; x < cols; x++) {
+      target[i] = [x * b + x * cw / cols , y * b + y * ch / rows, cw / cols, ch / rows];
+      i++;
+    }
+  }
+
+  //var target = new Array(9);
+  //target[0] = [b, 			b, 			cw_1_3,			ch_1_3];
+  //target[1] = [2 * b + cw_1_3, 	b, 			cw_1_3,			ch_1_3];
+  //target[2] = [3 * b + cw_2_3,	b,			cw_1_3,			ch_1_3];
+  //target[3] = [b,			2 * b + ch_1_3,		cw_1_3, 		ch_1_3];
+  //target[4] = [2 * b + cw_1_3,	2 * b + ch_1_3,		cw_1_3,			ch_1_3];
+  //target[5] = [3 * b + cw_2_3,	2 * b + ch_1_3,		cw_1_3,			ch_1_3];
+  //target[6] = [b,			3 * b + ch_2_3,		cw_1_3,			ch_1_3];
+  //target[7] = [2 * b + cw_1_3,	3 * b + ch_2_3,		cw_1_3,			ch_1_3];
+  //target[8] = [3 * b + cw_2_3,	3 * b + ch_2_3,		cw_1_3,			ch_1_3];
 
   return target;
 }
 
+function updateGridSize(e) {
+  if (parseInt(e.target.value) > 1) {
+    val = parseInt(e.target.value);
+  }
+  else {
+    return false;
+  }
+  if (e.target.id == "width") {
+    gridWidth = val;
+  }
+  else if (e.target.id == "height") {
+    gridHeight = val;
+  }
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  source = computeSourceMatrix(gridWidth, gridHeight);
+  target = computeTargetMatrix(gridWidth, gridHeight);
+}
+
 window.addEventListener("load", function() {
 
-  // Source.
-  const fps = 30;
-  const src = '../ground.mp4';
-  const w = 640;
-  const h = 360;
-  const w_1_3 = w / 3;
-  const w_2_3 = 2 * w / 3;
-  const h_1_3 = h / 3;
-  const h_2_3 = 2 * h / 3;
-
-  // Source matrix.
-  var source = new Array(9);
-  source[0] = [0, 		0, 		w_1_3,	 		h_1_3];
-  source[1] = [w_1_3, 		0, 		w_1_3,			h_1_3];
-  source[2] = [w_2_3,		0,		w_1_3,			h_1_3];
-  source[3] = [0,		h_1_3,		w_1_3,	 		h_1_3];
-  source[4] = [w_1_3,		h_1_3,		w_1_3,			h_1_3];
-  source[5] = [w_2_3,		h_1_3,		w_1_3,			h_1_3];
-  source[6] = [0,		h_2_3,		w_1_3,			h_1_3];
-  source[7] = [w_1_3,		h_2_3,		w_1_3,			h_1_3];
-  source[8] = [w_2_3,		h_2_3,		w_1_3,			h_1_3];
-
-  target = computeTargetMatrix(window.innerWidth, window.innerHeight);
+  source = computeSourceMatrix(gridWidth, gridHeight);
+  target = computeTargetMatrix(gridWidth, gridHeight);
 
   // Setup elements.
   const vid = document.querySelector("video");
   vid.src = src;
   const stop = document.getElementById("stop");
   const play = document.getElementById("play");
+  canvas = document.getElementById("canvas");
+  context = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
   stop.addEventListener("click", function() {
     console.log("stopping " + vid.className);
@@ -85,18 +126,24 @@ window.addEventListener("load", function() {
     console.log("playing " + vid.className);
     vid.play();
   });
+  hide.addEventListener("click", function() {
+    other.style.display = 'none';
+  });
+  canvas.addEventListener("click", function() {
+    other.style.display = 'unset';
+  });
+  width.value = gridWidth;
+  height.value = gridHeight;
+  width.addEventListener("input", updateGridSize);
+  height.addEventListener("input", updateGridSize);
 
-  const canvas = document.getElementById("canvas");
-  const context = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
   vid.addEventListener("play", function() {
     if (vid.paused || vid.ended) {
       clearInterval(timer);
       return false;
     }
     timer = setInterval(function() {
-      for (i=0; i < 9; i++) {
+      for (i=0; i < source.length; i++) {
         context.drawImage(vid, source[i][0], source[i][1], source[i][2], source[i][3], target[i][0], target[i][1], target[i][2], target[i][3]);
       }
     }, 1000 / fps);
@@ -104,10 +151,11 @@ window.addEventListener("load", function() {
 });
 
 window.addEventListener("resize", function(e) {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  context.fillRect(0, 0, canvas.width, canvas.height);
   // compute target matrix.
-  canvas.width = e.target.innerWidth;
-  canvas.height = e.target.innerHeight;
-  target = computeTargetMatrix(e.target.innerWidth, e.target.innerHeight);
+  target = computeTargetMatrix(gridWidth, gridHeight);
 });
 </script>
 </head>
@@ -115,10 +163,24 @@ window.addEventListener("resize", function(e) {
 
 <canvas id="canvas"></canvas>
 
+<div id="other">
 <video loop controls muted></video>
+
+<p>Grid size:</p>
+<p>Width: <input type="number" id="width" /></p>
+<p>Height: <input type="number" id="height" /></p>
 
 <button id="stop">Stop All</button>
 <button id="play">Play All</button>
+
+<!-- Hide/unhide -->
+<button id="hide">Hide controls</button>
+
+<!-- Randomize -->
+
+<!-- Snake -->
+</div>
+
 
 </body>
 </html>
