@@ -1,0 +1,21 @@
+body {
+  margin: 0;
+  background: #333333;
+  color: white;
+}
+canvas {
+  background: black;
+  width: 100%;
+}
+video {
+  height: 200px;
+  border: 1px solid white;
+  float: left;
+  margin: 0 10px 10px 0;
+}
+#other {
+  padding: 10px;
+}
+input[type=number] {
+  width: 100px;
+}

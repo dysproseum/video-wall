@@ -1,29 +1,12 @@
 <html>
 <head>
 
-<style type="text/css">
-body {
-  margin: 0;
-  background: #333333;
-  color: white;
-}
-canvas {
-  background: black;
-  width: 100%;
-}
-video {
-  height: 200px;
-  border: 1px solid white;
-}
-#other {
-  margin: 10px;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="style.css" media="screen">
 
 <script type="text/javascript" src="individual.js"></script>
-<script type="text/javascript" src="snake.js"></script>
 <script type="text/javascript" src="reverse.js"></script>
 <script type="text/javascript" src="random.js"></script>
+<script type="text/javascript" src="snake.js"></script>
 
 <script type="text/javascript">
 // Default variables.
@@ -196,17 +179,18 @@ window.addEventListener("resize", function(e) {
 
 <body>
 <div id="other">
-  <input type="text" id="vid_src" />
+  <input type="text" id="vid_src" size="64" />
   <button id="load">Load</button>
   <video loop controls muted></video>
 
-  <p>Grid size:</p>
-  <p>Width: <input type="number" id="width" /></p>
-  <p>Height: <input type="number" id="height" /></p>
+  <p>Grid Width: <input type="number" id="width" /></p>
+  <p>Grid Height: <input type="number" id="height" /></p>
 
   <button id="stop">Stop All</button>
   <button id="play">Play All</button>
   <button id="hide">Hide controls</button>
+
+  <p>Effects:</p>
 </div>
 
 <canvas id="canvas"></canvas>
