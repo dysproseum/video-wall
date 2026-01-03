@@ -16,6 +16,7 @@ video {
 }
 </style>
 <script type="text/javascript" src="individual.js"></script>
+<script type="text/javascript" src="snake.js"></script>
 <script type="text/javascript">
 // Set variables.
 const src = '../ground.mp4';
@@ -32,8 +33,6 @@ var context;
 var source;
 var target;
 var timer;
-var snake_frame;
-var snake_path;
 
 function computeSourceMatrix(cols, rows) {
   // Source.
@@ -151,14 +150,6 @@ window.addEventListener("load", function() {
     run();
   });
 
-  runsnake.addEventListener("click", function() {
-    snake();
-  });
-  document.addEventListener("keydown", function(e) {
-    if (e.code == "KeyS") {
-      snake();
-    }
-  });
 });
 
 function run() {
@@ -169,40 +160,6 @@ function run() {
   }, 1000 / fps);
 }
 
-function snakeadvance() {
-  snake_frame++;
-  context.fillRect(0, 0, canvas.width, canvas.height);
-  if (snake_frame < source.length) {
-    setTimeout(snakeadvance, 500);
-    return;
-  }
-  clearInterval(timer);
-  run();
-}
-
-function snake() {
-  clearInterval(timer);
-  context.fillRect(0, 0, canvas.width, canvas.height);
-
-  snake_path = new Array();//gridWidth * gridHeight);
-  for(i=0; i < gridHeight; i++) {
-    var part = target.slice(i * gridWidth, i * gridWidth + gridWidth);
-    if (i % 2 == 0) {
-      // reverse odd rows
-      part.reverse();
-    }
-    snake_path = snake_path.concat(part);
-  }
-
-  snake_frame = 0;
-  snake_forward = false;
-  timer = setInterval(function() {
-    context.drawImage(vid, 0, 0, w, h, snake_path[snake_frame][0], snake_path[snake_frame][1], snake_path[snake_frame][2], snake_path[snake_frame][3]);
-  }, 1000 / fps);
-
-  setTimeout(snakeadvance, 500);
-
-}
 
 window.addEventListener("resize", function(e) {
   canvas.width = window.innerWidth;
@@ -225,7 +182,6 @@ window.addEventListener("resize", function(e) {
 <button id="stop">Stop All</button>
 <button id="play">Play All</button>
 <button id="hide">Hide controls</button>
-<button id="runsnake">Snake (S)</button>
 
 <!-- Randomize -->
 
