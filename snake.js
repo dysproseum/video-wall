@@ -1,3 +1,4 @@
+var snake_delay = 500;
 var snake_frame;
 var snake_path;
 
@@ -5,7 +6,7 @@ function snakeadvance() {
   snake_frame++;
   context.fillRect(0, 0, canvas.width, canvas.height);
   if (snake_frame < source.length) {
-    setTimeout(snakeadvance, 500);
+    setTimeout(snakeadvance, snake_delay);
     return;
   }
   clearInterval(timer);
@@ -32,7 +33,7 @@ function run_snake() {
     context.drawImage(vid, 0, 0, w, h, snake_path[snake_frame][0], snake_path[snake_frame][1], snake_path[snake_frame][2], snake_path[snake_frame][3]);
   }, 1000 / fps);
 
-  setTimeout(snakeadvance, 500);
+  setTimeout(snakeadvance, snake_delay);
 
 }
 
@@ -49,4 +50,13 @@ window.addEventListener("load", function() {
       run_snake();
     }
   });
+  var input = document.createElement('input');
+  input.type = 'number';
+  input.id = 'num_snake_delay';
+  input.value = snake_delay;
+  input.addEventListener('input', function(e) {
+    snake_delay = e.target.value;
+  });
+  other.append(' Snake delay (ms): ');
+  other.append(input);
 });
