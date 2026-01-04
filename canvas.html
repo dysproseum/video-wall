@@ -1,14 +1,15 @@
 <html>
 <head>
 
-<link rel="stylesheet" type="text/css" href="style.css" media="screen">
+<link rel="stylesheet" type="text/css" href="assets/style.css" media="screen">
 
-<script type="text/javascript" src="individual.js"></script>
-<script type="text/javascript" src="reverse.js"></script>
-<script type="text/javascript" src="random.js"></script>
-<script type="text/javascript" src="snake.js"></script>
+<script type="text/javascript" src="effects/individual.js"></script>
+<script type="text/javascript" src="effects/reverse.js"></script>
+<script type="text/javascript" src="effects/random.js"></script>
+<script type="text/javascript" src="effects/snake.js"></script>
 
 <script type="text/javascript">
+
 // Default variables.
 const src = 'assets/test.mp4';
 var w = 640;
@@ -27,8 +28,6 @@ var target;
 var timer;
 
 function computeSourceMatrix(cols, rows) {
-  // Source.
-
   // Source matrix.
   var source = new Array(cols * rows);
   var i = 0;
@@ -67,7 +66,6 @@ function computeTargetMatrix(cols, rows) {
     }
   }
 
-  //var target = new Array(9);
   //target[0] = [b, 			b, 			cw_1_3,			ch_1_3];
   //target[1] = [2 * b + cw_1_3, 	b, 			cw_1_3,			ch_1_3];
   //target[2] = [3 * b + cw_2_3,	b,			cw_1_3,			ch_1_3];
@@ -100,6 +98,7 @@ function updateGridSize(e) {
 }
 
 function run() {
+  clearTimeout(timer);
   timer = setInterval(function() {
     for (i=0; i < source.length; i++) {
       context.drawImage(vid, source[i][0], source[i][1], source[i][2], source[i][3], target[i][0], target[i][1], target[i][2], target[i][3]);
@@ -108,7 +107,6 @@ function run() {
 }
 
 window.addEventListener("load", function() {
-
   // Initialize grid matrices.
   source = computeSourceMatrix(gridWidth, gridHeight);
   target = computeTargetMatrix(gridWidth, gridHeight);
@@ -171,9 +169,9 @@ window.addEventListener("resize", function(e) {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   context.fillRect(0, 0, canvas.width, canvas.height);
-  // compute target matrix.
   target = computeTargetMatrix(gridWidth, gridHeight);
 });
+
 </script>
 </head>
 

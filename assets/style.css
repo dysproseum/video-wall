@@ -8,12 +8,13 @@ canvas {
   width: 100%;
 }
 video {
+  float: left;
   height: 200px;
   border: 1px solid white;
-  float: left;
-  margin: 0 10px 10px 0;
+  margin-right: 10px;
 }
 #other {
+  float: left;
   padding: 10px;
 }
 input[type=number] {

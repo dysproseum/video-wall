@@ -8,59 +8,32 @@ video {
   width: 30%;
   border: 1px solid white;
 }
-video.block::-webkit-media-controls {
- background: black; 
-}
-
-.container {
-  position: relative;
-  width: 512px;
-  height: 384px;
-  overflow: hidden;
-}
-
-.video {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  transform: scale(2);
-  top: 50%;
-  left: 50%;
-  transform-origin: center;
-}
-
 </style>
+<script type="text/javascript">
+
+var videos = new Array(9);
+videos[0] = 'assets/test.mp4';
+videos[1] = 'assets/test.mp4';
+videos[2] = 'assets/test.mp4';
+videos[3] = 'assets/test.mp4';
+videos[4] = 'assets/test.mp4';
+videos[5] = 'assets/test.mp4';
+videos[6] = 'assets/test.mp4';
+videos[7] = 'assets/test.mp4';
+videos[8] = 'assets/test.mp4';
+
+for (i=0; i < videos.length; i++) {
+  document.writeln('<video loop nocontrols muted class="video ' + i  + '" src="' + videos[i] + '"></video>');
+}
+</script>
 </head>
 <body>
-<?php
-
-$videos[] = '../ground.mp4';
-$videos[] = '../ground.mp4';
-$videos[] = '../ground.mp4';
-$videos[] = '../ground.mp4';
-$videos[] = '../ground.mp4';
-$videos[] = '../ground.mp4';
-$videos[] = '../ground.mp4';
-$videos[] = '../ground.mp4';
-$videos[] = '../ground.mp4';
-
-?>
-
-<?php foreach ($videos as $i => $video): ?>
-
-  <div class="container">
-  <video loop controls muted class="video <?php print $i; ?>" src="<?php print $video; ?>"></video>
-  </div>
-
-<?php endforeach; ?>
 
 <button id="stop">Stop All</button>
 <button id="play">Play All</button>
 <button id="sync">Sync All</button>
 
 <script type="text/javascript">
-
-    //context.drawImage(source, 0, 0, canvas.width, canvas.height);
 
 window.addEventListener("load", function() {
   const vids = document.querySelectorAll("video");
